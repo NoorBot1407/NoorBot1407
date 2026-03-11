@@ -1015,7 +1015,7 @@ body.urdu .bubble { font-size: 15px; }
 </nav>
 
 <script>
-const OWNER_KEY = 'AIzaSyAICK0NnUop-jHJNIcBszikHkCRyZqwUks'; // ← paste your free Gemini key here
+const OWNER_KEY = 'AIzaSyAICK0NnUop-jHJNIcBszikHkCRyZqwUks';
 
 async function callAI(system, messages, maxTokens=1000) {
   // Convert Anthropic format to Gemini format
@@ -1025,7 +1025,7 @@ async function callAI(system, messages, maxTokens=1000) {
   }));
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${OWNER_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${OWNER_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
