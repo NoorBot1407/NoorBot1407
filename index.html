@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoorBot – Islamic AI Companion</title>
+<meta name="description" content="Free Islamic AI chatbot with Quran & Sunnah references, fact checker, prayer times, duas and more.">
+<meta name="theme-color" content="#09100f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NoorBot">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #09100f;
+  --surface:   #0f1a18;
+  --surface2:  #162320;
+  --surface3:  #1d2e2b;
+  --surface4:  #243733;
+  --teal:      #14b8a6;
+  --teal-dim:  #0d9488;
+  --teal-glow: rgba(20,184,166,0.12);
+  --teal-border: rgba(20,184,166,0.22);
+  --gold:      #fbbf24;
+  --gold-dim:  #d97706;
+  --gold-glow: rgba(251,191,36,0.12);
+  --gold-border: rgba(251,191,36,0.22);
+  --red:       #f87171;
+  --red-glow:  rgba(248,113,113,0.12);
+  --red-border:rgba(248,113,113,0.22);
+  --orange:    #fb923c;
+  --orange-glow: rgba(251,146,60,0.12);
+  --green:     #4ade80;
+  --green-glow:rgba(74,222,128,0.12);
+  --green-border:rgba(74,222,128,0.22);
+  --text:      #e2ede8;
+  --text-muted:#7a9e94;
+  --text-dim:  #4a6b63;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --shadow:    rgba(0,0,0,0.4);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Geometric Islamic pattern overlay */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(20,184,166,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 90% 100%, rgba(251,191,36,0.05) 0%, transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ══════ HEADER ══════ */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.logo { display:flex;align-items:center;gap:9px; }
+.logo-gem {
+  width:38px;height:38px;
+  background: linear-gradient(135deg, var(--teal-dim), var(--teal));
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;
+  box-shadow: 0 0 20px rgba(20,184,166,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.logo-text { font-family:'Amiri',serif; font-size:21px; color:var(--text); }
+.logo-tag {
+  font-size:9px;font-family:'Tajawal',sans-serif;font-weight:500;
+  background:var(--teal-glow);border:1px solid var(--teal-border);
+  color:var(--teal);padding:2px 8px;border-radius:20px;letter-spacing:.5px;
+}
+
+.lang-toggle {
+  margin-left:auto;
+  display:flex;gap:4px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;padding:3px;
+}
+.lang-btn {
+  padding:4px 10px;border-radius:5px;border:none;
+  font-family:'Tajawal',sans-serif;font-size:11px;font-weight:500;
+  cursor:pointer;transition:all .2s;color:var(--text-muted);background:transparent;
+}
+.lang-btn.active{background:var(--surface4);color:var(--text);}
+
+/* ══════ BOTTOM NAV ══════ */
+.bottom-nav {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 4px 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Tajawal', sans-serif;
+  color: var(--text-dim);
+  position: relative;
+}
+
+.nav-btn.active { color: var(--teal); }
+.nav-btn.active::before {
+  content:'';
+  position:absolute;top:0;left:15%;right:15%;
+  height:2px;background:var(--teal);
+  border-radius:0 0 4px 4px;
+  box-shadow: 0 0 8px var(--teal);
+}
+
+.nav-icon { font-size:20px; }
+.nav-label { font-size:9px;font-weight:500;letter-spacing:.3px; }
+
+/* ══════ MAIN ══════ */
+.main { flex:1;overflow:hidden;z-index:1;display:flex;flex-direction:column; }
+.panel { display:none;flex-direction:column;flex:1;overflow:hidden; }
+.panel.active { display:flex; }
+
+/* ══════ SHARED SCROLL AREA ══════ */
+.scroll-area {
+  flex:1;overflow-y:auto;
+  scroll-behavior:smooth;
+}
+.scroll-area::-webkit-scrollbar{width:3px;}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ══════════════════════════════════
+   1. CHAT PANEL
+══════════════════════════════════ */
+.chat-scroll { padding:18px 14px 10px; display:flex;flex-direction:column;gap:14px; }
+
+.chat-welcome { text-align:center;padding:24px 16px 10px;animation:up .5s ease; }
+.arabic-bismillah {
+  font-family:'Amiri',serif;font-size:22px;
+  color:var(--gold);direction:rtl;margin-bottom:8px;
+}
+.chat-welcome h2{font-size:19px;margin-bottom:6px;}
+.chat-welcome p{color:var(--text-muted);font-size:13px;max-width:320px;margin:0 auto 18px;line-height:1.7;}
+
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:420px;margin:0 auto;}
+.quick-card {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:12px 10px;cursor:pointer;text-align:left;
+  font-family:'Tajawal',sans-serif;transition:all .2s;color:var(--text);
+}
+.quick-card:hover{border-color:var(--teal-border);background:var(--teal-glow);transform:translateY(-2px);}
+.qc-icon{font-size:20px;margin-bottom:5px;display:block;}
+.qc-title{font-size:12px;font-weight:700;color:var(--teal);display:block;margin-bottom:2px;}
+.qc-text{font-size:11px;color:var(--text-muted);line-height:1.4;}
+
+/* Messages */
+.msg{display:flex;gap:9px;animation:up .3s ease;max-width:680px;margin:0 auto;width:100%;}
+.msg.user{flex-direction:row-reverse;}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.av{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.av.bot{background:linear-gradient(135deg,var(--teal-dim),var(--teal));box-shadow:0 0 12px rgba(20,184,166,.3);}
+.av.usr{background:linear-gradient(135deg,#2d4a3e,#3d6b58);}
+
+.bubble{padding:12px 14px;border-radius:14px;font-size:13.5px;line-height:1.75;max-width:calc(100% - 44px);}
+.msg.bot .bubble{background:var(--surface2);border:1px solid var(--border);border-top-left-radius:3px;color:var(--text);}
+.msg.user .bubble{background:linear-gradient(135deg,var(--teal-dim),var(--teal));color:#fff;border-top-right-radius:3px;}
+
+.ref-block{margin-top:10px;background:var(--surface3);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:8px;padding:10px 12px;}
+.ref-label{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.ref-item{color:var(--text-muted);font-size:12px;margin-bottom:3px;display:flex;gap:6px;}
+.note-disc{font-size:11px;color:var(--text-dim);font-style:italic;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;}
+.arabic-quote{font-family:'Amiri',serif;font-size:18px;color:var(--teal);direction:rtl;text-align:right;margin:6px 0;line-height:2;}
+
+/* Typing */
+.typing-row{display:flex;gap:9px;max-width:680px;margin:0 auto;width:100%;animation:up .3s ease;}
+.typing-bub{background:var(--surface2);border:1px solid var(--border);border-radius:14px;border-top-left-radius:3px;padding:13px 15px;display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:bounce 1.2s infinite;}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* Chat input */
+.chat-input-area{background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
+.chat-row{display:flex;gap:8px;align-items:flex-end;max-width:680px;margin:0 auto;}
+.chat-ta{
+  flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+  padding:10px 14px;font-family:'Tajawal',sans-serif;font-size:13.5px;color:var(--text);
+  resize:none;outline:none;min-height:42px;max-height:100px;transition:all .2s;line-height:1.5;
+}
+.chat-ta::placeholder{color:var(--text-dim);}
+.chat-ta:focus{border-color:var(--teal-border);box-shadow:0 0 0 3px var(--teal-glow);}
+.send-btn{
+  width:42px;height:42px;background:linear-gradient(135deg,var(--teal-dim),var(--teal));
+  border:none;border-radius:12px;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;box-shadow:0 0 14px rgba(20,184,166,.25);
+}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(20,184,166,.4);}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.chat-footer{text-align:center;font-size:10px;color:var(--text-dim);margin-top:6px;max-width:680px;margin-left:auto;margin-right:auto;}
+
+/* ══════════════════════════════════
+   2. FACT CHECKER PANEL
+══════════════════════════════════ */
+.fact-scroll{padding:16px 14px 80px;display:flex;flex-direction:column;gap:14px;}
+
+.fact-hero{text-align:center;padding:14px 16px 4px;animation:up .5s ease;}
+.fact-hero-icon{font-size:40px;display:block;margin-bottom:8px;filter:drop-shadow(0 4px 12px rgba(251,191,36,.4));}
+.fact-hero h2{font-size:19px;margin-bottom:5px;}
+.fact-hero p{color:var(--text-muted);font-size:12.5px;max-width:360px;margin:0 auto;line-height:1.7;}
+
+.fact-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px;max-width:680px;margin:0 auto;animation:up .4s ease;}
+.fact-card h3{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* Method tabs */
+.method-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;}
+.mtab{
+  padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;font-family:'Tajawal',sans-serif;font-size:11.5px;font-weight:500;
+  color:var(--text-muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;
+}
+.mtab.active{background:var(--gold-glow);border-color:var(--gold-border);color:var(--gold);}
+
+/* Screenshot upload zone */
+.upload-zone {
+  border:2px dashed var(--border2);border-radius:12px;padding:28px 20px;
+  text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+  background:var(--surface3);
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--gold-border);background:var(--gold-glow);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:36px;display:block;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(251,191,36,.3));}
+.upload-zone h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.upload-zone p{font-size:11px;color:var(--text-muted);}
+.upload-zone .formats{font-size:10px;color:var(--text-dim);margin-top:6px;}
+
+.img-preview{
+  position:relative;border-radius:10px;overflow:hidden;
+  border:1px solid var(--border2);max-height:220px;
+}
+.img-preview img{width:100%;height:auto;max-height:220px;object-fit:cover;display:block;}
+.img-preview-remove{
+  position:absolute;top:8px;right:8px;
+  background:rgba(0,0,0,.7);border:1px solid var(--border2);
+  border-radius:6px;padding:4px 9px;font-size:11px;color:#fff;cursor:pointer;
+  font-family:'Tajawal',sans-serif;
+}
+
+.fact-field{
+  background:var(--surface3);border:1px solid var(--border);border-radius:10px;
+  padding:10px 13px;font-family:'Tajawal',sans-serif;font-size:13px;
+  color:var(--text);outline:none;width:100%;transition:all .2s;
+}
+.fact-field::placeholder{color:var(--text-dim);}
+.fact-field:focus{border-color:var(--gold-border);box-shadow:0 0 0 3px var(--gold-glow);}
+.fact-ta{resize:none;min-height:85px;line-height:1.6;}
+
+.input-group{display:flex;flex-direction:column;gap:9px;}
+
+.verify-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+  border:none;border-radius:10px;padding:13px;font-family:'Tajawal',sans-serif;
+  font-size:14px;font-weight:700;color:#0a1a10;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 18px rgba(251,191,36,.3);margin-top:4px;
+}
+.verify-btn:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(251,191,36,.45);}
+.verify-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+/* RESULT */
+.result-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:680px;margin:0 auto;animation:up .4s ease;}
+.res-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.verdict-pill{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap;}
+.v-auth{background:var(--green-glow);border:1px solid var(--green-border);color:var(--green);}
+.v-weak{background:var(--orange-glow);border:1px solid rgba(251,146,60,.3);color:var(--orange);}
+.v-fab{background:var(--red-glow);border:1px solid var(--red-border);color:var(--red);}
+.v-mix{background:var(--gold-glow);border:1px solid var(--gold-border);color:var(--gold);}
+.v-unk{background:rgba(100,116,139,.15);border:1px solid rgba(100,116,139,.3);color:#94a3b8;}
+.res-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.res-sub{font-size:11.5px;color:var(--text-muted);}
+
+.conf-wrap{padding:13px 18px;border-bottom:1px solid var(--border);}
+.conf-top{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:6px;}
+.conf-bar{height:6px;background:var(--surface3);border-radius:6px;overflow:hidden;}
+.conf-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.cf-green{background:linear-gradient(90deg,#16a34a,var(--green));}
+.cf-orange{background:linear-gradient(90deg,#c2410c,var(--orange));}
+.cf-red{background:linear-gradient(90deg,#991b1b,var(--red));}
+.cf-gold{background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+.cf-gray{background:linear-gradient(90deg,#475569,#64748b);}
+
+.res-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+.res-sec h4{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.res-sec p{font-size:13px;color:var(--text);line-height:1.75;}
+
+.warn-box{background:var(--red-glow);border:1px solid var(--red-border);border-radius:10px;padding:12px 14px;font-size:12.5px;color:#fca5a5;line-height:1.6;display:flex;gap:8px;align-items:flex-start;}
+
+.speaker-block{background:var(--surface3);border:1px solid var(--border);border-radius:10px;padding:13px;display:flex;gap:10px;}
+.spk-av{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.spk-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.spk-role{font-size:11px;color:var(--text-muted);margin-bottom:7px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.tg{background:var(--green-glow);color:var(--green);border:1px solid var(--green-border);}
+.to{background:var(--orange-glow);color:var(--orange);border:1px solid rgba(251,146,60,.3);}
+.tr{background:var(--red-glow);color:var(--red);border:1px solid var(--red-border);}
+.tq{background:var(--gold-glow);color:var(--gold);border:1px solid var(--gold-border);}
+.tgr{background:rgba(100,116,139,.15);color:#94a3b8;border:1px solid rgba(100,116,139,.2);}
+
+.src-list{display:flex;flex-direction:column;gap:6px;}
+.src-item{background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text-muted);}
+
+.checking-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:30px 20px;text-align:center;max-width:680px;margin:0 auto;animation:up .3s ease;}
+.spin{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.step-list{margin-top:12px;display:flex;flex-direction:column;gap:7px;text-align:left;}
+.step-item{font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:8px;}
+.step-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:pulse-dot 1.5s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+.res-footer{padding:10px 18px;border-top:1px solid var(--border);background:var(--surface3);font-size:10.5px;color:var(--text-dim);text-align:center;}
+
+/* Share btn */
+.share-row{display:flex;gap:8px;margin-top:4px;}
+.share-btn{
+  flex:1;padding:9px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface3);font-family:'Tajawal',sans-serif;font-size:12px;
+  color:var(--text-muted);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.share-btn:hover{border-color:var(--teal-border);color:var(--teal);background:var(--teal-glow);}
+
+/* ══════════════════════════════════
+   3. DAILY SUNNAH PANEL
+══════════════════════════════════ */
+.sunnah-scroll{padding:16px 14px 80px;display:flex;flex-direction:column;gap:14px;}
+
+.sunnah-header-card{
+  background:linear-gradient(135deg,rgba(20,184,166,.15),rgba(251,191,36,.08));
+  border:1px solid var(--teal-border);border-radius:16px;padding:20px 18px;
+  text-align:center;max-width:680px;margin:0 auto;animation:up .5s ease;
+}
+.sunnah-header-card .sh-date{font-size:11px;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.sunnah-header-card .sh-title{font-family:'Amiri',serif;font-size:24px;color:var(--gold);direction:rtl;margin-bottom:6px;}
+.sunnah-header-card .sh-sub{font-size:13px;color:var(--text-muted);}
+
+.sunnah-of-day{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;max-width:680px;margin:0 auto;animation:up .5s ease .1s both;}
+.sod-label{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.sod-arabic{font-family:'Amiri',serif;font-size:22px;color:var(--text);direction:rtl;text-align:right;line-height:1.8;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sod-translation{font-size:14px;color:var(--text);line-height:1.75;margin-bottom:10px;}
+.sod-ref{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+.sod-benefit{background:var(--teal-glow);border:1px solid var(--teal-border);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--text);margin-top:10px;line-height:1.6;}
+
+.category-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;max-width:680px;margin:0 auto;scrollbar-width:none;}
+.category-row::-webkit-scrollbar{display:none;}
+.cat-btn{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface2);font-family:'Tajawal',sans-serif;font-size:12px;
+  color:var(--text-muted);cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.cat-btn.active,.cat-btn:hover{background:var(--teal-glow);border-color:var(--teal-border);color:var(--teal);}
+
+.sunnah-grid{display:flex;flex-direction:column;gap:10px;max-width:680px;margin:0 auto;}
+.sunnah-item{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:15px;cursor:pointer;transition:all .2s;}
+.sunnah-item:hover{border-color:var(--teal-border);background:var(--teal-glow);}
+.si-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.si-icon{width:36px;height:36px;border-radius:9px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.si-title{font-size:13px;font-weight:600;color:var(--text);}
+.si-cat{font-size:10px;color:var(--text-muted);}
+.si-text{font-size:12.5px;color:var(--text-muted);line-height:1.65;}
+.si-ref{font-size:10.5px;color:var(--text-dim);margin-top:6px;}
+
+/* ══════════════════════════════════
+   4. DUA FINDER PANEL
+══════════════════════════════════ */
+.dua-scroll{padding:16px 14px 80px;display:flex;flex-direction:column;gap:12px;}
+
+.dua-search-wrap{max-width:680px;margin:0 auto;width:100%;animation:up .4s ease;}
+.dua-search{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;font-family:'Tajawal',sans-serif;
+  font-size:14px;color:var(--text);outline:none;transition:all .2s;
+}
+.dua-search::placeholder{color:var(--text-dim);}
+.dua-search:focus{border-color:var(--teal-border);box-shadow:0 0 0 3px var(--teal-glow);}
+
+.dua-situations{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;max-width:680px;margin:0 auto;scrollbar-width:none;}
+.dua-situations::-webkit-scrollbar{display:none;}
+.sit-btn{
+  flex-shrink:0;padding:7px 13px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface2);font-family:'Tajawal',sans-serif;font-size:11.5px;
+  color:var(--text-muted);cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.sit-btn:hover,.sit-btn.active{background:var(--gold-glow);border-color:var(--gold-border);color:var(--gold);}
+
+.dua-list{display:flex;flex-direction:column;gap:10px;max-width:680px;margin:0 auto;}
+.dua-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;animation:up .3s ease;}
+.dua-card-header{padding:13px 15px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.dua-emoji{font-size:22px;}
+.dua-title{font-size:13px;font-weight:600;color:var(--text);flex:1;}
+.dua-chevron{color:var(--text-dim);transition:transform .3s;font-size:12px;}
+.dua-card.open .dua-chevron{transform:rotate(180deg);}
+.dua-body{display:none;padding:0 15px 15px;border-top:1px solid var(--border);}
+.dua-card.open .dua-body{display:block;}
+.dua-arabic{font-family:'Amiri',serif;font-size:22px;color:var(--teal);direction:rtl;text-align:right;line-height:2;margin:12px 0;}
+.dua-transliteration{font-size:12.5px;color:var(--gold);font-style:italic;margin-bottom:6px;line-height:1.6;}
+.dua-meaning{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:8px;}
+.dua-source{font-size:11px;color:var(--text-dim);}
+.dua-actions{display:flex;gap:7px;margin-top:10px;}
+.dua-act-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface3);font-family:'Tajawal',sans-serif;font-size:11.5px;color:var(--text-muted);cursor:pointer;transition:all .2s;}
+.dua-act-btn:hover{border-color:var(--teal-border);color:var(--teal);}
+
+/* ══════════════════════════════════
+   5. PRAYER TIMES PANEL
+══════════════════════════════════ */
+.prayer-scroll{padding:16px 14px 80px;display:flex;flex-direction:column;gap:12px;}
+
+.prayer-header{
+  background:linear-gradient(135deg,rgba(20,184,166,.18),rgba(9,16,15,.8));
+  border:1px solid var(--teal-border);border-radius:16px;padding:20px 18px;
+  text-align:center;max-width:680px;margin:0 auto;animation:up .5s ease;
+  position:relative;overflow:hidden;
+}
+.prayer-header::before{
+  content:'🌙';font-size:80px;position:absolute;right:-10px;top:-10px;
+  opacity:.08;filter:grayscale(1);
+}
+.ph-city{font-size:12px;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.ph-time{font-family:'Amiri',serif;font-size:42px;color:var(--text);margin-bottom:4px;}
+.ph-date{font-size:12px;color:var(--text-muted);}
+.ph-next{margin-top:14px;background:rgba(0,0,0,.3);border-radius:10px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center;font-size:13px;}
+.ph-next-label{color:var(--text-muted);}
+.ph-next-prayer{color:var(--teal);font-weight:600;}
+.ph-next-time{color:var(--gold);font-weight:600;}
+
+.prayer-list{display:flex;flex-direction:column;gap:8px;max-width:680px;margin:0 auto;}
+.prayer-item{
+  background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;display:flex;align-items:center;gap:12px;
+  transition:all .2s;
+}
+.prayer-item.current{background:var(--teal-glow);border-color:var(--teal-border);}
+.pi-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0;}
+.pi-name{flex:1;}
+.pi-arabic{font-family:'Amiri',serif;font-size:14px;color:var(--text);display:block;}
+.pi-eng{font-size:11px;color:var(--text-muted);}
+.pi-time{font-size:17px;font-weight:600;color:var(--text);}
+.prayer-item.current .pi-time{color:var(--teal);}
+.current-badge{font-size:10px;background:var(--teal-glow);border:1px solid var(--teal-border);color:var(--teal);padding:2px 8px;border-radius:20px;margin-left:6px;}
+
+.loc-note{text-align:center;font-size:11.5px;color:var(--text-muted);max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:5px;}
+.loc-btn{background:none;border:none;color:var(--teal);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:11.5px;text-decoration:underline;}
+
+/* Qibla */
+.qibla-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;max-width:680px;margin:0 auto;text-align:center;}
+.qibla-title{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.qibla-compass{
+  width:120px;height:120px;border-radius:50%;
+  border:3px solid var(--border2);
+  background:var(--surface3);
+  margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;font-size:40px;
+  box-shadow:0 0 30px rgba(20,184,166,.15);
+}
+.qibla-deg{font-size:13px;color:var(--teal);font-weight:600;}
+.qibla-note{font-size:11.5px;color:var(--text-muted);margin-top:4px;}
+
+/* ══════════════════════════════
+   LANGUAGE RTL support
+══════════════════════════════ */
+body.urdu .chat-ta { direction: rtl; text-align: right; font-size: 15px; }
+body.urdu .fact-field { direction: rtl; text-align: right; }
+body.urdu .bubble { font-size: 15px; }
+
+/* ══════════════════════════════════
+   6. HALAL NEWS PANEL
+══════════════════════════════════ */
+.news-scroll { padding: 16px 14px 80px; display:flex; flex-direction:column; gap:14px; }
+
+.news-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  max-width:680px; margin:0 auto; width:100%;
+}
+.news-topbar h2 { font-size:18px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+.news-live-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--red-glow); border:1px solid var(--red-border);
+  color:var(--red); font-size:10px; font-weight:700;
+  padding:3px 9px; border-radius:20px; letter-spacing:.8px; text-transform:uppercase;
+}
+.live-pulse { width:5px; height:5px; border-radius:50%; background:var(--red); animation:pulse-dot 1s infinite; }
+
+.news-cats {
+  display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;
+  max-width:680px; margin:0 auto; scrollbar-width:none;
+}
+.news-cats::-webkit-scrollbar { display:none; }
+.ncat {
+  flex-shrink:0; padding:6px 14px; border-radius:20px;
+  border:1px solid var(--border); background:var(--surface2);
+  font-family:'Tajawal',sans-serif; font-size:12px;
+  color:var(--text-muted); cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.ncat.active,.ncat:hover { background:var(--red-glow); border-color:var(--red-border); color:var(--red); }
+
+/* Featured news card */
+.news-featured {
+  max-width:680px; margin:0 auto; width:100%;
+  background: linear-gradient(135deg, rgba(248,113,113,.15), rgba(251,191,36,.08));
+  border:1px solid rgba(248,113,113,.25); border-radius:16px;
+  overflow:hidden; cursor:pointer; transition:all .2s; animation:up .4s ease;
+}
+.news-featured:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(248,113,113,.15); }
+.news-feat-img {
+  width:100%; height:160px; object-fit:cover;
+  background: linear-gradient(135deg,var(--surface3),var(--surface4));
+  display:flex; align-items:center; justify-content:center;
+  font-size:60px; overflow:hidden;
+}
+.news-feat-body { padding:16px; }
+.news-feat-meta { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.news-feat-tag {
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+  padding:3px 9px; border-radius:20px; background:var(--red-glow);
+  border:1px solid var(--red-border); color:var(--red);
+}
+.news-feat-time { font-size:11px; color:var(--text-dim); }
+.news-feat-title { font-size:16px; font-weight:700; color:var(--text); line-height:1.5; margin-bottom:6px; }
+.news-feat-summary { font-size:12.5px; color:var(--text-muted); line-height:1.65; }
+.news-feat-footer { display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
+.news-read-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--red-glow); border:1px solid var(--red-border);
+  color:var(--red); padding:7px 14px; border-radius:8px;
+  font-size:12px; font-weight:600; font-family:'Tajawal',sans-serif; cursor:pointer;
+  transition:all .2s;
+}
+.news-read-btn:hover { background:rgba(248,113,113,.25); }
+.news-impact { font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:4px; }
+
+/* News list items */
+.news-list { display:flex; flex-direction:column; gap:9px; max-width:680px; margin:0 auto; width:100%; }
+
+.news-item {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:13px; padding:14px; display:flex; gap:12px;
+  cursor:pointer; transition:all .2s; animation:up .3s ease;
+}
+.news-item:hover { border-color:rgba(248,113,113,.2); background:rgba(248,113,113,.04); transform:translateX(3px); }
+
+.news-item-emoji {
+  width:50px; height:50px; border-radius:10px;
+  background:var(--surface3); display:flex; align-items:center;
+  justify-content:center; font-size:24px; flex-shrink:0;
+}
+.news-item-body { flex:1; min-width:0; }
+.news-item-meta { display:flex; align-items:center; gap:7px; margin-bottom:5px; flex-wrap:wrap; }
+.news-tag {
+  font-size:10px; font-weight:600; padding:2px 7px; border-radius:10px;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.nt-global  { background:rgba(20,184,166,.12); color:var(--teal); border:1px solid var(--teal-border); }
+.nt-ummah   { background:var(--gold-glow); color:var(--gold); border:1px solid var(--gold-border); }
+.nt-economy { background:var(--green-glow); color:var(--green); border:1px solid var(--green-border); }
+.nt-politics{ background:var(--orange-glow); color:var(--orange); border:1px solid rgba(251,146,60,.3); }
+.nt-science { background:rgba(167,139,250,.12); color:#a78bfa; border:1px solid rgba(167,139,250,.25); }
+.nt-rights  { background:var(--red-glow); color:var(--red); border:1px solid var(--red-border); }
+.news-time  { font-size:10.5px; color:var(--text-dim); }
+.news-item-title { font-size:13.5px; font-weight:600; color:var(--text); line-height:1.45; margin-bottom:4px; }
+.news-item-snip  { font-size:12px; color:var(--text-muted); line-height:1.55; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* Impact pills */
+.impact-row { display:flex; gap:5px; margin-top:7px; flex-wrap:wrap; }
+.impact-pill {
+  font-size:10px; padding:2px 8px; border-radius:20px;
+  display:flex; align-items:center; gap:3px; font-weight:500;
+}
+.ip-high { background:var(--red-glow); color:var(--red); border:1px solid var(--red-border); }
+.ip-med  { background:var(--gold-glow); color:var(--gold); border:1px solid var(--gold-border); }
+.ip-low  { background:var(--green-glow); color:var(--green); border:1px solid var(--green-border); }
+
+/* ── NEWS DETAIL MODAL ── */
+.news-modal {
+  position:fixed; inset:0; z-index:200;
+  display:none; flex-direction:column;
+  background:var(--bg);
+  animation:slideUp .3s ease;
+}
+.news-modal.open { display:flex; }
+@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.modal-header {
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:0 16px; height:54px; display:flex; align-items:center; gap:12px;
+  flex-shrink:0; z-index:10;
+}
+.modal-back {
+  width:34px; height:34px; border-radius:9px;
+  background:var(--surface2); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:16px; flex-shrink:0;
+  font-family:'Tajawal',sans-serif; color:var(--text);
+}
+.modal-back:hover { background:var(--surface3); }
+.modal-title { font-size:14px; font-weight:600; color:var(--text); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.modal-share {
+  width:34px; height:34px; border-radius:9px;
+  background:var(--surface2); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px; flex-shrink:0;
+  font-family:'Tajawal',sans-serif;
+}
+
+.modal-body { flex:1; overflow-y:auto; padding:20px 16px 30px; }
+.modal-body::-webkit-scrollbar { width:3px; }
+.modal-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
+
+.modal-inner { max-width:680px; margin:0 auto; display:flex; flex-direction:column; gap:18px; }
+
+.modal-hero-emoji {
+  font-size:70px; text-align:center; padding:20px 0 10px;
+  filter:drop-shadow(0 4px 16px rgba(248,113,113,.3));
+  animation:up .4s ease;
+}
+.modal-news-title {
+  font-size:22px; font-weight:700; color:var(--text); line-height:1.45;
+  text-align:center; animation:up .4s ease .05s both;
+}
+.modal-meta {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  flex-wrap:wrap; animation:up .4s ease .1s both;
+}
+.modal-source { font-size:12px; color:var(--text-muted); }
+
+/* AI Analysis loading */
+.analysis-loading {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:14px; padding:24px; text-align:center;
+}
+.analysis-spin { width:36px; height:36px; border:2px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 10px; }
+.analysis-loading p { font-size:13px; color:var(--text-muted); }
+
+/* Analysis result sections */
+.analysis-card {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden; animation:up .4s ease;
+}
+.analysis-card-header {
+  padding:14px 16px; background:var(--surface3);
+  border-bottom:1px solid var(--border);
+  font-size:12px; font-weight:700; color:var(--text-muted);
+  text-transform:uppercase; letter-spacing:1px;
+  display:flex; align-items:center; gap:7px;
+}
+.analysis-card-body { padding:15px 16px; }
+
+.summary-text { font-size:14px; color:var(--text); line-height:1.8; }
+
+.pros-cons-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.pros-box, .cons-box {
+  border-radius:10px; padding:12px;
+}
+.pros-box { background:var(--green-glow); border:1px solid var(--green-border); }
+.cons-box { background:var(--red-glow); border:1px solid var(--red-border); }
+.pc-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+.pros-box .pc-title { color:var(--green); }
+.cons-box .pc-title { color:var(--red); }
+.pc-item { font-size:12px; color:var(--text); line-height:1.6; margin-bottom:5px; display:flex; gap:6px; align-items:flex-start; }
+.pc-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.pros-box .pc-dot { background:var(--green); }
+.cons-box .pc-dot { background:var(--red); }
+
+.islamic-take {
+  background: linear-gradient(135deg, var(--teal-glow), var(--gold-glow));
+  border:1px solid var(--teal-border); border-radius:10px;
+  padding:13px 15px;
+}
+.it-label { font-size:10px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; }
+.it-text { font-size:13px; color:var(--text); line-height:1.75; }
+.it-ref { font-size:11.5px; color:var(--gold); margin-top:7px; font-style:italic; }
+
+.impact-meter { display:flex; flex-direction:column; gap:8px; }
+.im-row { display:flex; align-items:center; gap:10px; }
+.im-label { font-size:12px; color:var(--text-muted); width:100px; flex-shrink:0; }
+.im-bar { flex:1; height:7px; background:var(--surface3); border-radius:7px; overflow:hidden; }
+.im-fill { height:100%; border-radius:7px; transition:width 1s ease; }
+.im-fill.red { background:linear-gradient(90deg,#991b1b,var(--red)); }
+.im-fill.gold { background:linear-gradient(90deg,var(--gold-dim),var(--gold)); }
+.im-fill.teal { background:linear-gradient(90deg,var(--teal-dim),var(--teal)); }
+.im-pct { font-size:11px; color:var(--text-dim); width:30px; text-align:right; flex-shrink:0; }
+
+.what-to-do {
+  background:var(--surface3); border:1px solid var(--border);
+  border-radius:10px; padding:13px 15px;
+}
+.wtd-title { font-size:11px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.wtd-item { font-size:12.5px; color:var(--text); line-height:1.65; margin-bottom:5px; display:flex; gap:7px; }
+
+.related-row { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+.related-row::-webkit-scrollbar { display:none; }
+.related-chip {
+  flex-shrink:0; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px; cursor:pointer; transition:all .2s;
+  min-width:140px;
+}
+.related-chip:hover { border-color:var(--teal-border); background:var(--teal-glow); }
+.rc-emoji { font-size:20px; margin-bottom:4px; }
+.rc-title { font-size:12px; font-weight:600; color:var(--text); line-height:1.4; }
+
+/* Notification toast */
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface3);border:1px solid var(--border2);
+  border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);
+  z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-gem">🕌</div>
+    <span class="logo-text">NoorBot</span>
+    <span class="logo-tag">v3 • Beta</span>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ur')">اردو</button>
+    <button class="lang-btn" onclick="setLang('ar')">عربي</button>
+  </div>
+</header>
+
+<!-- MAIN PANELS -->
+<div class="main">
+
+  <!-- ═══ 1. CHAT ═══ -->
+  <div class="panel active" id="panelChat">
+    <div class="scroll-area">
+      <div class="chat-scroll" id="chatScroll">
+        <div class="chat-welcome" id="chatWelcome">
+          <div class="arabic-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+          <h2 id="wTitle">As-salamu alaykum 🤍</h2>
+          <p id="wDesc">Ask anything about Islam privately. Every answer is backed by authentic Quran & Sunnah references.</p>
+          <div class="quick-grid">
+            <button class="quick-card" onclick="chatSample('What are the conditions for my prayer to be valid according to authentic hadith?')"><span class="qc-icon">🙏</span><span class="qc-title">Salah & Worship</span><span class="qc-text">Prayer, purification, fasting</span></button>
+            <button class="quick-card" onclick="chatSample('I feel my iman is very weak lately, what does the Sunnah say I should do?')"><span class="qc-icon">💚</span><span class="qc-title">Strengthen Iman</span><span class="qc-text">Spiritual struggles, waswas</span></button>
+            <button class="quick-card" onclick="chatSample('What does Islam say about talking to a non-mahram for work or study purposes?')"><span class="qc-icon">💑</span><span class="qc-title">Relationships</span><span class="qc-text">Mahram, marriage, family</span></button>
+            <button class="quick-card" onclick="chatSample('What does Islam say about mental health, anxiety and depression?')"><span class="qc-icon">🧠</span><span class="qc-title">Mental Health</span><span class="qc-text">Anxiety, grief, healing</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-row">
+        <textarea class="chat-ta" id="chatInput" placeholder="Ask your question privately..." rows="1"
+          onkeydown="chatKey(event)" oninput="autoGrow(this)"></textarea>
+        <button class="send-btn" id="chatSendBtn" onclick="chatSend()">➤</button>
+      </div>
+      <div class="chat-footer">🔒 Private · Authentic references only · Not a fatwa — consult a qualified scholar for personal rulings</div>
+    </div>
+  </div>
+
+  <!-- ═══ 2. FACT CHECKER ═══ -->
+  <div class="panel" id="panelFact">
+    <div class="scroll-area">
+      <div class="fact-scroll" id="factScroll">
+        <div class="fact-hero">
+          <span class="fact-hero-icon">🔍</span>
+          <h2>Islamic Fact Checker</h2>
+          <p>Verify claims from YouTube, reels, WhatsApp, or any speaker. Upload a screenshot or paste the text.</p>
+        </div>
+
+        <div class="fact-card">
+          <h3>📋 Choose verification method</h3>
+          <div class="method-tabs">
+            <button class="mtab active" id="mt0" onclick="switchMethod(0)">📸 Screenshot</button>
+            <button class="mtab" id="mt1" onclick="switchMethod(1)">📝 Paste Claim</button>
+            <button class="mtab" id="mt2" onclick="switchMethod(2)">🎙️ Check Speaker</button>
+          </div>
+
+          <!-- METHOD 0: Screenshot -->
+          <div id="method0" class="input-group">
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" id="screenshotInput" accept="image/*" onchange="handleScreenshot(event)">
+              <span class="upload-icon">📸</span>
+              <h4>Upload Screenshot</h4>
+              <p>From YouTube, TikTok, WhatsApp, Instagram, etc.</p>
+              <div class="formats">Supports: JPG, PNG, WEBP, HEIC</div>
+            </div>
+            <div id="imgPreviewWrap" style="display:none">
+              <div class="img-preview">
+                <img id="imgPreview" src="" alt="Screenshot">
+                <button class="img-preview-remove" onclick="removeScreenshot()">✕ Remove</button>
+              </div>
+            </div>
+            <input class="fact-field" id="screenshotNote" placeholder="Any context? e.g. 'This reel claimed this hadith is sahih...'" />
+            <button class="verify-btn" id="screenshotVerifyBtn" onclick="runScreenshotCheck()" disabled>
+              🔍 Analyze Screenshot
+            </button>
+          </div>
+
+          <!-- METHOD 1: Paste Claim -->
+          <div id="method1" class="input-group" style="display:none">
+            <input class="fact-field" id="claimSpeaker" placeholder="Speaker name (optional — e.g. Mufti Menk, Zakir Naik...)" />
+            <textarea class="fact-field fact-ta" id="claimText" placeholder="Paste the exact claim, hadith quote, or statement you want to verify...&#10;&#10;e.g. 'He said the Prophet ﷺ said whoever reads Surah Yaseen 40 times will...'"></textarea>
+            <input class="fact-field" id="claimPlatform" placeholder="Source platform (optional — YouTube, TikTok, WhatsApp...)" />
+            <button class="verify-btn" onclick="runClaimCheck()">🔍 Verify Claim</button>
+          </div>
+
+          <!-- METHOD 2: Speaker Check -->
+          <div id="method2" class="input-group" style="display:none">
+            <input class="fact-field" id="speakerName" placeholder="Speaker / Scholar name (e.g. Nouman Ali Khan, Dr. Israr Ahmed...)" />
+            <textarea class="fact-field fact-ta" id="speakerContext" placeholder="What topic did they discuss? (optional)&#10;&#10;Or leave blank for a full credibility assessment."></textarea>
+            <button class="verify-btn" onclick="runSpeakerCheck()">🔍 Assess Credibility</button>
+          </div>
+        </div>
+
+        <div id="factResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 3. DAILY SUNNAH ═══ -->
+  <div class="panel" id="panelSunnah">
+    <div class="scroll-area">
+      <div class="sunnah-scroll">
+        <div class="sunnah-header-card">
+          <div class="sh-date" id="todayDate"></div>
+          <div class="sh-title">السنة اليومية</div>
+          <div class="sh-sub">Daily Sunnah & Authentic Practices</div>
+        </div>
+
+        <div class="sunnah-of-day" id="sunnahOfDay">
+          <div class="sod-label">⭐ Sunnah of the Day</div>
+          <div class="sod-arabic">مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ</div>
+          <div class="sod-translation">"Whoever says 'SubhanAllahi wa bihamdihi' one hundred times a day — his sins will be forgiven even if they were like the foam of the sea."</div>
+          <div class="sod-ref">📖 Sahih al-Bukhari 6405 · Sahih Muslim 2691</div>
+          <div class="sod-benefit">💡 <strong>Why this matters:</strong> This is one of the easiest dhikr with the greatest reward. It takes only 2–3 minutes. Do it while commuting, cooking, or walking.</div>
+        </div>
+
+        <div class="category-row">
+          <button class="cat-btn active" onclick="filterSunnah('all',this)">All</button>
+          <button class="cat-btn" onclick="filterSunnah('morning',this)">🌅 Morning</button>
+          <button class="cat-btn" onclick="filterSunnah('evening',this)">🌆 Evening</button>
+          <button class="cat-btn" onclick="filterSunnah('eating',this)">🍽️ Eating</button>
+          <button class="cat-btn" onclick="filterSunnah('sleeping',this)">😴 Sleeping</button>
+          <button class="cat-btn" onclick="filterSunnah('social',this)">🤝 Social</button>
+          <button class="cat-btn" onclick="filterSunnah('hygiene',this)">🧴 Hygiene</button>
+        </div>
+
+        <div class="sunnah-grid" id="sunnahGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 4. DUA FINDER ═══ -->
+  <div class="panel" id="panelDua">
+    <div class="scroll-area">
+      <div class="dua-scroll">
+        <input class="dua-search" id="duaSearch" placeholder="🔍  Search duas... e.g. 'anxiety', 'before sleep', 'travelling'" oninput="filterDuas(this.value)">
+
+        <div class="dua-situations">
+          <button class="sit-btn active" onclick="filterDuasByTag('all',this)">All</button>
+          <button class="sit-btn" onclick="filterDuasByTag('anxiety',this)">😟 Anxiety</button>
+          <button class="sit-btn" onclick="filterDuasByTag('morning',this)">🌅 Morning</button>
+          <button class="sit-btn" onclick="filterDuasByTag('sleep',this)">😴 Sleep</button>
+          <button class="sit-btn" onclick="filterDuasByTag('travel',this)">✈️ Travel</button>
+          <button class="sit-btn" onclick="filterDuasByTag('protection',this)">🛡️ Protection</button>
+          <button class="sit-btn" onclick="filterDuasByTag('forgiveness',this)">🤲 Forgiveness</button>
+          <button class="sit-btn" onclick="filterDuasByTag('rizq',this)">💰 Rizq</button>
+          <button class="sit-btn" onclick="filterDuasByTag('family',this)">👨‍👩‍👧 Family</button>
+        </div>
+
+        <div class="dua-list" id="duaList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 5. PRAYER TIMES ═══ -->
+  <div class="panel" id="panelPrayer">
+    <div class="scroll-area">
+      <div class="prayer-scroll">
+        <div class="prayer-header">
+          <div class="ph-city" id="phCity">📍 Getting location...</div>
+          <div class="ph-time" id="phTime">--:--</div>
+          <div class="ph-date" id="phDate"></div>
+          <div class="ph-next">
+            <span class="ph-next-label">Next:</span>
+            <span class="ph-next-prayer" id="phNextPrayer">--</span>
+            <span class="ph-next-label">in</span>
+            <span class="ph-next-time" id="phNextTime">--</span>
+          </div>
+        </div>
+
+        <div class="loc-note">
+          <span>Prayer times are approximate. </span>
+          <button class="loc-btn" onclick="getPrayerTimes()">📍 Use My Location</button>
+        </div>
+
+        <div class="prayer-list" id="prayerList"></div>
+
+        <div class="qibla-card">
+          <div class="qibla-title">🧭 Qibla Direction</div>
+          <div class="qibla-compass">🕋</div>
+          <div class="qibla-deg" id="qiblaDeg">Enable location for Qibla</div>
+          <div class="qibla-note">Always verify with a local mosque or compass</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 6. HALAL NEWS ═══ -->
+  <div class="panel" id="panelNews">
+    <div class="scroll-area">
+      <div class="news-scroll" id="newsScroll">
+
+        <div class="news-topbar">
+          <h2>🌍 Halal News</h2>
+          <span class="news-live-badge"><span class="live-pulse"></span>LIVE</span>
+        </div>
+
+        <div class="news-cats">
+          <button class="ncat active" onclick="filterNews('all',this)">🌐 All</button>
+          <button class="ncat" onclick="filterNews('ummah',this)">☪️ Ummah</button>
+          <button class="ncat" onclick="filterNews('global',this)">🌍 Global</button>
+          <button class="ncat" onclick="filterNews('economy',this)">💰 Economy</button>
+          <button class="ncat" onclick="filterNews('politics',this)">🏛️ Politics</button>
+          <button class="ncat" onclick="filterNews('rights',this)">✊ Rights</button>
+          <button class="ncat" onclick="filterNews('science',this)">🔬 Science</button>
+        </div>
+
+        <div id="newsFeatured"></div>
+        <div class="news-list" id="newsList"></div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ NEWS DETAIL MODAL ═══ -->
+<div class="news-modal" id="newsModal">
+  <div class="modal-header">
+    <button class="modal-back" onclick="closeNewsModal()">←</button>
+    <span class="modal-title" id="modalTitle">News Analysis</span>
+    <button class="modal-share" onclick="shareCurrentNews()" title="Share">↗</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-inner" id="modalInner"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav0" onclick="switchPanel('Chat')">
+    <span class="nav-icon">💬</span>
+    <span class="nav-label">Ask Noor</span>
+  </button>
+  <button class="nav-btn" id="nav1" onclick="switchPanel('Fact')">
+    <span class="nav-icon">🔍</span>
+    <span class="nav-label">Verify</span>
+  </button>
+  <button class="nav-btn" id="nav2" onclick="switchPanel('News')">
+    <span class="nav-icon">🌍</span>
+    <span class="nav-label">News</span>
+  </button>
+  <button class="nav-btn" id="nav3" onclick="switchPanel('Sunnah')">
+    <span class="nav-icon">⭐</span>
+    <span class="nav-label">Sunnah</span>
+  </button>
+  <button class="nav-btn" id="nav4" onclick="switchPanel('Dua')">
+    <span class="nav-icon">🤲</span>
+    <span class="nav-label">Duas</span>
+  </button>
+  <button class="nav-btn" id="nav5" onclick="switchPanel('Prayer')">
+    <span class="nav-icon">🕌</span>
+    <span class="nav-label">Prayer</span>
+  </button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG — all AI calls go through YOUR Netlify
+// server. Users never see or need an API key.
+// ══════════════════════════════════════════
+const API_URL = '/api/ai';
+
+async function callAI(system, messages, maxTokens=1000) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system, messages, max_tokens: maxTokens })
+  });
+  if (!res.ok) throw new Error('SERVER_ERROR');
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || 'API_ERROR');
+  return data;
+}
+
+// These are no longer needed — kept to prevent JS errors
+function showSetupModal() {}
+function saveApiKey() {}
+function toggleKeyVisibility() {}
+function resetApiKey() {}
+
+// ══════════════════════════════════════════
+// CORE NAVIGATION
+// ══════════════════════════════════════════
+const panels = ['Chat','Fact','News','Sunnah','Dua','Prayer'];
+
+function switchPanel(name) {
+  panels.forEach((p,i) => {
+    document.getElementById('panel'+p).classList.toggle('active', p===name);
+    document.getElementById('nav'+i).classList.toggle('active', p===name);
+  });
+  if (name==='Prayer') initPrayer();
+  if (name==='News') initNews();
+}
+
+// ══════════════════════════════════════════
+// LANGUAGE
+// ══════════════════════════════════════════
+let lang = 'en';
+const langs = {
+  en: { wTitle:'As-salamu alaykum 🤍', wDesc:'Ask anything about Islam privately. Every answer is backed by authentic Quran & Sunnah references.', placeholder:'Ask your question privately...' },
+  ur: { wTitle:'السلام علیکم 🤍', wDesc:'اسلام کے بارے میں کوئی بھی سوال نجی طور پر پوچھیں۔ ہر جواب قرآن اور سنت کے مستند حوالہ جات کے ساتھ ہوگا۔', placeholder:'اپنا سوال نجی طور پر پوچھیں...' },
+  ar: { wTitle:'السلام عليكم 🤍', wDesc:'اسأل عن أي شيء في الإسلام بشكل خاص. كل إجابة مدعومة بمراجع أصيلة من القرآن والسنة.', placeholder:'اسأل سؤالك بخصوصية...' }
+};
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach((b,i) => b.classList.toggle('active', ['en','ur','ar'][i]===l));
+  const d = langs[l];
+  document.getElementById('wTitle').textContent = d.wTitle;
+  document.getElementById('wDesc').textContent = d.wDesc;
+  document.getElementById('chatInput').placeholder = d.placeholder;
+  document.body.className = l==='ur' ? 'urdu' : '';
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════
+let chatHistory = [], chatBusy = false;
+
+const CHAT_SYS = `You are NoorBot, a compassionate Islamic AI companion. You help Muslims find authentic guidance in a private, shame-free environment.
+
+STRICT RULES:
+1. Answer ONLY using Quran, Sahih Hadith (Bukhari, Muslim, Abu Dawud, Tirmidhi, Nasai, Ibn Majah), and established scholarly consensus.
+2. ALWAYS cite your exact source (Surah+Ayah, or Hadith collection+number).
+3. Never guess. If scholars differ, present both views fairly.
+4. Never issue fatwa. End sensitive answers with: "For a personal ruling, consult a qualified scholar."
+5. Be warm, non-judgmental. Many users feel shame — treat them like a caring elder would.
+6. For sin/mistakes: remind of Allah's infinite mercy and the beauty of tawbah.
+7. Include Arabic text when quoting Quran or major Hadith.
+8. Format: warm answer → Arabic quote → translation → 📚 References: [source1], [source2]
+9. Add 🔒 for sensitive topics.
+10. Only discuss Islamic topics. Gently redirect if off-topic.
+11. Respond in the same language the user writes in (Urdu, Arabic, or English).`;
+
+function autoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chatSend();}}
+function chatSample(t){document.getElementById('chatInput').value=t;chatSend();}
+
+function removeWelcome(){const w=document.getElementById('chatWelcome');if(w)w.remove();}
+
+function addMsg(role, html){
+  removeWelcome();
+  const wrap=document.getElementById('chatScroll');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  const av=document.createElement('div');
+  av.className=`av ${role==='bot'?'bot':'usr'}`;
+  av.textContent=role==='bot'?'🕌':'👤';
+  const bub=document.createElement('div');
+  bub.className='bubble';
+  bub.innerHTML=html;
+  div.appendChild(av);div.appendChild(bub);
+  wrap.appendChild(div);
+  wrap.parentElement.scrollTop=wrap.parentElement.scrollHeight;
+}
+
+function showTyping(){
+  const wrap=document.getElementById('chatScroll');
+  const div=document.createElement('div');
+  div.className='typing-row';div.id='typing';
+  div.innerHTML=`<div class="av bot">🕌</div><div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  wrap.appendChild(div);
+  wrap.parentElement.scrollTop=wrap.parentElement.scrollHeight;
+}
+function removeTyping(){const e=document.getElementById('typing');if(e)e.remove();}
+
+function formatChat(text){
+  return '<p>'+text
+    .replace(/📚 References?:(.*?)(\n\n|\n(?=[A-Z🔒📖])|$)/gs,(_,refs)=>{
+      const items=refs.split(/[,;]/).map(r=>r.trim()).filter(Boolean);
+      return `</p><div class="ref-block"><div class="ref-label">📚 Authentic References</div>${items.map(i=>`<div class="ref-item">📖 ${i}</div>`).join('')}</div><p>`;
+    })
+    .replace(/🔒(.*?)(\n|$)/g,'</p><div class="note-disc">🔒$1</div><p>')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>')+'</p>';
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+async function chatSend(){
+  const input=document.getElementById('chatInput');
+  const btn=document.getElementById('chatSendBtn');
+  const text=input.value.trim();
+  if(!text||chatBusy)return;
+  addMsg('user',esc(text));
+  chatHistory.push({role:'user',content:text});
+  input.value='';input.style.height='auto';
+  chatBusy=true;btn.disabled=true;showTyping();
+  try{
+    const data=await callAI(CHAT_SYS,chatHistory);
+    const reply=data.content?.map(b=>b.text||'').join('')||'Please try again.';
+    removeTyping();
+    chatHistory.push({role:'assistant',content:reply});
+    addMsg('bot',formatChat(reply));
+  }catch(err){
+    removeTyping();
+    if(err.message==='NO_KEY'){
+      addMsg('bot','🔑 <strong>API key needed!</strong> Please add your free Anthropic API key to activate NoorBot. <br><br><button onclick="showSetupModal()" style="background:var(--teal);border:none;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:Tajawal,sans-serif;font-size:13px;">➕ Add API Key (Free)</button>');
+    } else {
+      addMsg('bot','⚠️ Something went wrong. Please check your internet connection and try again. 🤲');
+    }
+  }
+  chatBusy=false;btn.disabled=false;input.focus();
+}
+
+// ══════════════════════════════════════════
+// FACT CHECKER
+// ══════════════════════════════════════════
+let currentMethod=0, screenshotBase64=null, screenshotType=null;
+
+function switchMethod(i){
+  currentMethod=i;
+  [0,1,2].forEach(j=>{
+    document.getElementById('method'+j).style.display=j===i?'flex':'none';
+    document.getElementById('mt'+j).classList.toggle('active',j===i);
+  });
+}
+
+function handleScreenshot(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const dataUrl=ev.target.result;
+    const base64=dataUrl.split(',')[1];
+    screenshotBase64=base64;
+    screenshotType=file.type;
+    document.getElementById('imgPreview').src=dataUrl;
+    document.getElementById('imgPreviewWrap').style.display='block';
+    document.getElementById('uploadZone').style.display='none';
+    document.getElementById('screenshotVerifyBtn').disabled=false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeScreenshot(){
+  screenshotBase64=null;screenshotType=null;
+  document.getElementById('imgPreview').src='';
+  document.getElementById('imgPreviewWrap').style.display='none';
+  document.getElementById('uploadZone').style.display='block';
+  document.getElementById('screenshotVerifyBtn').disabled=true;
+  document.getElementById('screenshotInput').value='';
+}
+
+const FACT_SYS=`You are NoorBot's Islamic Fact-Checking Engine. Analyze the provided content and return ONLY valid JSON.
+
+JSON FORMAT:
+{
+  "verdict": "AUTHENTIC"|"WEAK"|"FABRICATED"|"MIXED"|"UNVERIFIABLE",
+  "confidence": 0-100,
+  "claim_summary": "one-line summary",
+  "speaker_name": "name or Unknown",
+  "speaker_assessment": {
+    "credibility": "HIGH"|"MODERATE"|"LOW"|"MIXED"|"UNKNOWN",
+    "background": "brief background",
+    "known_for": ["tag1","tag2"],
+    "concerns": [],
+    "emoji": "🎓"
+  },
+  "verdict_explanation": "2-3 sentence clear explanation",
+  "islamic_evidence": {
+    "supporting": ["Quran/Hadith ref"],
+    "contradicting": []
+  },
+  "red_flags": [],
+  "recommendation": "what the user should do",
+  "scholar_consensus": "mainstream scholarly view",
+  "extracted_claims": ["claim1 found in content","claim2"]
+}
+
+RULES:
+- Be objective. Check the actual claim vs authentic sources.
+- Weak (da'if) and fabricated (mawdhu) hadith must be clearly identified.
+- Social media "sheikhs" with no credentials should be flagged.
+- If image shows text, extract all claims and check each one.
+- Return ONLY JSON — no markdown, no preamble.`;
+
+function showChecking(container){
+  container.innerHTML=`<div class="checking-card"><div class="spin"></div><p style="color:var(--text-muted);font-size:13px">Analyzing against Quran & Sunnah...</p><div class="step-list"><div class="step-item"><span class="step-dot"></span>Extracting claims from content</div><div class="step-item"><span class="step-dot"></span>Cross-referencing Hadith databases</div><div class="step-item"><span class="step-dot"></span>Assessing speaker credentials</div><div class="step-item"><span class="step-dot"></span>Compiling scholarly consensus</div></div></div>`;
+  document.getElementById('factScroll').scrollTop=600;
+}
+
+async function runScreenshotCheck(){
+  const note=document.getElementById('screenshotNote').value.trim();
+  const container=document.getElementById('factResult');
+  const btn=document.getElementById('screenshotVerifyBtn');
+  if(!screenshotBase64){showToast('Please upload a screenshot first');return;}
+  btn.disabled=true;showChecking(container);
+  try{
+    const data=await callAI(FACT_SYS,[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:screenshotType,data:screenshotBase64}},
+      {type:'text',text:`Analyze this screenshot for Islamic authenticity.${note?' Additional context: '+note:''} Extract all claims visible and verify each one.`}
+    ]}]);
+    const raw=data.content?.map(b=>b.text||'').join('')||'{}';
+    parseAndRenderResult(raw,container);
+  }catch{container.innerHTML=`<div class="checking-card"><p style="color:var(--text-muted)">Connection error. Please try again.</p></div>`;}
+  btn.disabled=false;
+}
+
+async function runClaimCheck(){
+  const speaker=document.getElementById('claimSpeaker').value.trim();
+  const claim=document.getElementById('claimText').value.trim();
+  const platform=document.getElementById('claimPlatform').value.trim();
+  if(!claim){showToast('Please paste the claim to verify');return;}
+  const container=document.getElementById('factResult');
+  showChecking(container);
+  const prompt=`Speaker: ${speaker||'Unknown'}\nClaim: ${claim}\nPlatform: ${platform||'Unknown'}`;
+  await callFactAPI(prompt,container);
+}
+
+async function runSpeakerCheck(){
+  const name=document.getElementById('speakerName').value.trim();
+  const ctx=document.getElementById('speakerContext').value.trim();
+  if(!name){showToast('Please enter the speaker name');return;}
+  const container=document.getElementById('factResult');
+  showChecking(container);
+  const prompt=`Assess the Islamic credibility of this speaker: ${name}. Context: ${ctx||'General assessment'}`;
+  await callFactAPI(prompt,container);
+}
+
+async function callFactAPI(prompt,container){
+  try{
+    const data=await callAI(FACT_SYS,[{role:'user',content:prompt}]);
+    const raw=data.content?.map(b=>b.text||'').join('')||'{}';
+    parseAndRenderResult(raw,container);
+  }catch{container.innerHTML=`<div class="checking-card"><p style="color:var(--text-muted)">Connection error. Please try again.</p></div>`;}
+}
+
+function parseAndRenderResult(raw,container){
+  let r;
+  try{r=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch{r=null;}
+  container.innerHTML='';
+  if(r)renderResult(r,container);
+  else container.innerHTML=`<div class="checking-card"><p style="color:var(--text-muted)">Could not parse result. Please rephrase and try again.</p></div>`;
+}
+
+function vInfo(v){
+  const m={AUTHENTIC:{cls:'v-auth',icon:'✅',label:'Authentic',fc:'cf-green'},WEAK:{cls:'v-weak',icon:'⚠️',label:'Weak / Unverified',fc:'cf-orange'},FABRICATED:{cls:'v-fab',icon:'❌',label:'Fabricated',fc:'cf-red'},MIXED:{cls:'v-mix',icon:'🔶',label:'Mixed / Partial',fc:'cf-gold'},UNVERIFIABLE:{cls:'v-unk',icon:'❓',label:'Cannot Verify',fc:'cf-gray'}};
+  return m[v]||m.UNVERIFIABLE;
+}
+function credCls(c){return{HIGH:'tg',MODERATE:'tq',LOW:'tr',MIXED:'to',UNKNOWN:'tgr'}[c]||'tgr';}
+
+function renderResult(r,container){
+  const vi=vInfo(r.verdict);
+  const sa=r.speaker_assessment||{};
+  const ev=r.islamic_evidence||{};
+  const conf=r.confidence||50;
+  const card=document.createElement('div');
+  card.className='result-card';
+  card.innerHTML=`
+    <div class="res-header">
+      <div class="verdict-pill ${vi.cls}">${vi.icon} ${vi.label}</div>
+      <div>
+        <div class="res-title">${esc(r.claim_summary||'Analysis Complete')}</div>
+        <div class="res-sub">Speaker: ${esc(r.speaker_name||'Unknown')}</div>
+      </div>
+    </div>
+    <div class="conf-wrap">
+      <div class="conf-top"><span>Authenticity Confidence</span><span>${conf}%</span></div>
+      <div class="conf-bar"><div class="conf-fill ${vi.fc}" id="cFill" style="width:0%"></div></div>
+    </div>
+    <div class="res-body">
+      ${(r.verdict==='FABRICATED'||r.verdict==='WEAK')?`<div class="warn-box">⚠️ <div><strong>${r.verdict==='FABRICATED'?'Fabricated Claim:':'Weak Narration:'}</strong> ${r.verdict==='FABRICATED'?'This claim has no authentic basis in Islamic sources. Spreading it may be spreading falsehood — the Prophet ﷺ warned against narrating unverified hadith.':'This is based on weak (da\'if) narrations. Exercise caution before sharing or acting upon it.'}</div></div>`:''}
+      ${(r.extracted_claims||[]).length>1?`<div class="res-sec"><h4>📋 Claims Found</h4><div class="src-list">${(r.extracted_claims).map(c=>`<div class="src-item"><span>🔸</span>${esc(c)}</div>`).join('')}</div></div>`:''}
+      <div class="res-sec"><h4>📋 Verdict</h4><p>${esc(r.verdict_explanation||'')}</p></div>
+      ${sa.background?`<div class="res-sec"><h4>🎙️ Speaker Assessment</h4><div class="speaker-block"><div class="spk-av">${sa.emoji||'👤'}</div><div><div class="spk-name">${esc(r.speaker_name||'Unknown')}</div><div class="spk-role">${esc(sa.background||'')}</div><div class="tag-row"><span class="tag ${credCls(sa.credibility)}">${sa.credibility||'UNKNOWN'} CREDIBILITY</span>${(sa.known_for||[]).map(t=>`<span class="tag tgr">${esc(t)}</span>`).join('')}${(sa.concerns||[]).map(t=>`<span class="tag tr">⚠️ ${esc(t)}</span>`).join('')}</div></div></div></div>`:''}
+      ${[...(ev.supporting||[]),...(ev.contradicting||[])].length?`<div class="res-sec"><h4>📖 Islamic Evidence</h4><div class="src-list">${(ev.supporting||[]).map(s=>`<div class="src-item"><span>📗</span>${esc(s)}</div>`).join('')}${(ev.contradicting||[]).map(s=>`<div class="src-item"><span>📕</span>${esc(s)}</div>`).join('')}</div></div>`:''}
+      ${r.scholar_consensus?`<div class="res-sec"><h4>🎓 Scholar Consensus</h4><p>${esc(r.scholar_consensus)}</p></div>`:''}
+      <div class="res-sec"><h4>✅ What To Do</h4><p>${esc(r.recommendation||'')}</p></div>
+      <div class="share-row">
+        <button class="share-btn" onclick="copyResult()">📋 Copy Result</button>
+        <button class="share-btn" onclick="shareWhatsApp('${esc(vi.icon+' '+vi.label+': '+r.claim_summary)}')">💬 Share</button>
+      </div>
+    </div>
+    <div class="res-footer">NoorBot provides guidance only — not fatwa. Verify with a qualified Islamic scholar for personal rulings.</div>
+  `;
+  container.appendChild(card);
+  setTimeout(()=>{const f=document.getElementById('cFill');if(f)f.style.width=conf+'%';},100);
+  document.getElementById('factScroll').scrollTop=700;
+}
+
+function copyResult(){showToast('Result copied to clipboard! 📋');}
+function shareWhatsApp(text){window.open('https://wa.me/?text='+encodeURIComponent('NoorBot Fact Check: '+text),'_blank');}
+
+// ══════════════════════════════════════════
+// SUNNAH DATA
+// ══════════════════════════════════════════
+const sunnahData = [
+  {icon:'🌅',title:'Morning Dhikr',cat:'morning',text:'The Prophet ﷺ would say "Allahumma bika asbahna..." every morning to begin the day with remembrance of Allah.',ref:'Abu Dawud 5068'},
+  {icon:'🌆',title:'Evening Adhkar',cat:'evening',text:'Recite Ayat al-Kursi every evening for protection. The Prophet ﷺ said whoever recites it at night will be protected till morning.',ref:'Sahih Bukhari 2311'},
+  {icon:'🍽️',title:'Say Bismillah Before Eating',cat:'eating',text:'Always begin meals with Bismillah. If you forget at the start, say "Bismillah awwalahu wa akhirahu" when you remember.',ref:'Abu Dawud 3767, Tirmidhi 1858'},
+  {icon:'😴',title:'Sleep on Right Side',cat:'sleeping',text:'The Prophet ﷺ would sleep on his right side and recite the three Quls, then wipe over his body thrice.',ref:'Sahih Bukhari 6311'},
+  {icon:'🤝',title:'Give Salam First',cat:'social',text:'The Prophet ﷺ said: "The one who gives salam first is closer to Allah." Make it a habit to greet everyone with Assalamu Alaykum.',ref:'Abu Dawud 5197'},
+  {icon:'🧴',title:'Miswaak Before Prayer',cat:'hygiene',text:'The Prophet ﷺ said: "Were it not for the hardship on my ummah, I would have ordered them to use miswaak before every prayer."',ref:'Sahih Bukhari 887'},
+  {icon:'🌙',title:'Pray Two Rakat Before Fajr',cat:'morning',text:'The two sunnah rakat of Fajr are better than the world and everything in it, according to the Prophet ﷺ.',ref:'Sahih Muslim 725'},
+  {icon:'💧',title:'Enter Bathroom With Left Foot',cat:'hygiene',text:'The Sunnah is to enter the bathroom with the left foot and say "Allahumma inni a\'udhu bika minal khubuthi wal khaba\'ith."',ref:'Ibn Majah 297'},
+  {icon:'👋',title:'Right Hand for Everything Good',cat:'social',text:'The Prophet ﷺ preferred his right hand for eating, drinking, shaking hands, giving and taking.',ref:'Sahih Bukhari 168'},
+  {icon:'😴',title:'Read Ayat al-Kursi Before Sleep',cat:'sleeping',text:'Reciting Ayat al-Kursi before sleeping ensures an angel guards you all night and Shaytan cannot come near you.',ref:'Sahih Bukhari 2311'},
+  {icon:'🍽️',title:'Eat with Right Hand',cat:'eating',text:'The Prophet ﷺ said: "Do not eat with your left hand, for Shaytan eats with his left hand."',ref:'Sahih Muslim 2020'},
+  {icon:'✈️',title:'Dua When Leaving Home',cat:'social',text:'Say "Bismillah, tawakkaltu alallah, la hawla wa la quwwata illa billah" when leaving home — you will be guided and protected.',ref:'Abu Dawud 5095, Tirmidhi 3426'},
+];
+
+let currentSunnahCat='all';
+
+function filterSunnah(cat,btn){
+  currentSunnahCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSunnah();
+}
+
+function renderSunnah(){
+  const grid=document.getElementById('sunnahGrid');
+  const filtered=currentSunnahCat==='all'?sunnahData:sunnahData.filter(s=>s.cat===currentSunnahCat);
+  grid.innerHTML=filtered.map(s=>`
+    <div class="sunnah-item">
+      <div class="si-top">
+        <div class="si-icon">${s.icon}</div>
+        <div><div class="si-title">${s.title}</div><div class="si-cat">${s.cat}</div></div>
+      </div>
+      <div class="si-text">${s.text}</div>
+      <div class="si-ref">📖 ${s.ref}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// DUA DATA
+// ══════════════════════════════════════════
+const duaData=[
+  {emoji:'😟',title:'For Anxiety & Worry',tags:['anxiety'],arabic:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ',transliteration:'Allahumma inni a\'udhu bika minal-hammi wal-hazan...',meaning:'O Allah, I seek refuge in You from worry and grief, from incapacity and laziness, from cowardice and miserliness, from being heavily in debt and from being overpowered by men.',source:'Sahih Bukhari 6369'},
+  {emoji:'🌅',title:'Morning Dua (Waking Up)',tags:['morning'],arabic:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',transliteration:'Alhamdulillahil-ladhi ahyana ba\'da ma amatana wa ilayhin-nushur.',meaning:'All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.',source:'Sahih Bukhari 6312'},
+  {emoji:'😴',title:'Before Sleeping',tags:['sleep'],arabic:'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',transliteration:'Bismika Allahumma amutu wa ahya.',meaning:'In Your name O Allah, I die and I live.',source:'Sahih Bukhari 6324'},
+  {emoji:'✈️',title:'For Travelling',tags:['travel'],arabic:'اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ',transliteration:'Allahu Akbar (3x), SubhanAllahil-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinin...',meaning:'Glory be to Him Who has subjected this to us, and we were not capable of that, and surely to our Lord we are to return.',source:'Quran 43:13-14, Abu Dawud 2599'},
+  {emoji:'🛡️',title:'Morning Protection',tags:['protection','morning'],arabic:'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ',transliteration:'Bismillahil-ladhi la yadurru ma\'asmihi shay\'un fil-ardi wa la fis-sama\'i wa huwas-Sami\'ul-\'Alim.',meaning:'In the name of Allah with whose name nothing is harmed on earth or in the heavens, and He is the All-Hearing, All-Knowing.',source:'Abu Dawud 5088, Tirmidhi 3388'},
+  {emoji:'🤲',title:'Seeking Forgiveness (Sayyidul Istighfar)',tags:['forgiveness'],arabic:'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ',transliteration:'Allahumma anta Rabbi la ilaha illa anta, khalaqtani wa ana abduk...',meaning:'O Allah, You are my Lord. None has the right to be worshipped except You. You created me and I am Your servant... I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me.',source:'Sahih Bukhari 6306'},
+  {emoji:'💰',title:'For Rizq & Provision',tags:['rizq'],arabic:'اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ',transliteration:'Allahumma-kfini bi halalika \'an haramika wa aghnini bi fadhlika \'amman siwak.',meaning:'O Allah, suffice me with what You have allowed instead of what You have forbidden, and make me independent of all others besides You.',source:'Tirmidhi 3563'},
+  {emoji:'👨‍👩‍👧',title:'For Family & Children',tags:['family'],arabic:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ',transliteration:'Rabbana hab lana min azwajina wa dhurriyyatina qurrata a\'yunin waj\'alna lil-muttaqina imama.',meaning:'Our Lord, grant us from among our wives and offspring comfort to our eyes and make us a leader for the righteous.',source:'Quran 25:74'},
+];
+
+let currentDuaTag='all';
+
+function filterDuasByTag(tag,btn){
+  currentDuaTag=tag;
+  document.querySelectorAll('.sit-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDuas();
+}
+
+function filterDuas(q){
+  renderDuas(q.toLowerCase());
+}
+
+function renderDuas(q=''){
+  const list=document.getElementById('duaList');
+  let filtered=currentDuaTag==='all'?duaData:duaData.filter(d=>d.tags.includes(currentDuaTag));
+  if(q)filtered=filtered.filter(d=>d.title.toLowerCase().includes(q)||d.meaning.toLowerCase().includes(q)||d.tags.some(t=>t.includes(q)));
+  list.innerHTML=filtered.map((d,i)=>`
+    <div class="dua-card" id="dua${i}">
+      <div class="dua-card-header" onclick="toggleDua(${i})">
+        <span class="dua-emoji">${d.emoji}</span>
+        <span class="dua-title">${d.title}</span>
+        <span class="dua-chevron">▼</span>
+      </div>
+      <div class="dua-body">
+        <div class="dua-arabic">${d.arabic}</div>
+        <div class="dua-transliteration">📖 ${d.transliteration}</div>
+        <div class="dua-meaning">${d.meaning}</div>
+        <div class="dua-source">Source: ${d.source}</div>
+        <div class="dua-actions">
+          <button class="dua-act-btn" onclick="copyDua(${i})">📋 Copy</button>
+          <button class="dua-act-btn" onclick="shareDua(${i})">💬 Share</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleDua(i){
+  document.getElementById('dua'+i).classList.toggle('open');
+}
+
+function copyDua(i){
+  const d=duaData[i];
+  navigator.clipboard.writeText(`${d.title}\n\n${d.arabic}\n\n${d.transliteration}\n\nMeaning: ${d.meaning}\n\nSource: ${d.source}`).then(()=>showToast('Dua copied! 📋'));
+}
+
+function shareDua(i){
+  const d=duaData[i];
+  window.open('https://wa.me/?text='+encodeURIComponent(`*${d.title}*\n\n${d.arabic}\n\n${d.transliteration}\n\nMeaning: ${d.meaning}\n\nSource: ${d.source}\n\n_Shared via NoorBot_`),'_blank');
+}
+
+// ══════════════════════════════════════════
+// PRAYER TIMES
+// ══════════════════════════════════════════
+const prayers=[
+  {name:'الفجر',eng:'Fajr',icon:'🌙'},
+  {name:'الشروق',eng:'Sunrise',icon:'🌅'},
+  {name:'الظهر',eng:'Dhuhr',icon:'☀️'},
+  {name:'العصر',eng:'Asr',icon:'🌤️'},
+  {name:'المغرب',eng:'Maghrib',icon:'🌇'},
+  {name:'العشاء',eng:'Isha',icon:'🌙'},
+];
+
+let prayerTimesData=null;
+
+function initPrayer(){
+  updateClock();
+  setInterval(updateClock,1000);
+  renderDefaultPrayers();
+  getPrayerTimes();
+}
+
+function updateClock(){
+  const now=new Date();
+  document.getElementById('phTime').textContent=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('phDate').textContent=now.toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const d=new Date();
+  document.getElementById('todayDate').textContent=d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function renderDefaultPrayers(times){
+  const defaults=['05:15','06:38','12:45','16:10','19:02','20:25'];
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const pList=document.getElementById('prayerList');
+  let nextIdx=-1;
+  const tArr=times||defaults;
+
+  tArr.forEach((t,i)=>{
+    const [h,m]=t.split(':').map(Number);
+    const pMin=h*60+m;
+    if(nextIdx===-1&&pMin>nowMin)nextIdx=i;
+  });
+
+  pList.innerHTML=prayers.map((p,i)=>{
+    const isCurrent=i===nextIdx;
+    return `<div class="prayer-item${isCurrent?' current':''}">
+      <div class="pi-icon">${p.icon}</div>
+      <div class="pi-name"><span class="pi-arabic">${p.name}</span><span class="pi-eng">${p.eng}</span></div>
+      <div><span class="pi-time">${tArr[i]}</span>${isCurrent?'<span class="current-badge">Now</span>':''}</div>
+    </div>`;
+  }).join('');
+
+  if(nextIdx>=0){
+    document.getElementById('phNextPrayer').textContent=prayers[nextIdx].eng;
+    const [h,m]=(tArr[nextIdx]||'00:00').split(':').map(Number);
+    const diff=(h*60+m)-nowMin;
+    document.getElementById('phNextTime').textContent=`${Math.floor(diff/60)}h ${diff%60}m`;
+  }
+}
+
+function getPrayerTimes(){
+  if(!navigator.geolocation){showToast('Geolocation not supported');return;}
+  document.getElementById('phCity').textContent='📍 Getting your location...';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const {latitude:lat,longitude:lng}=pos.coords;
+    const today=new Date();
+    const dateStr=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    try{
+      const res=await fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=2`);
+      const data=await res.json();
+      if(data.code===200){
+        const t=data.data.timings;
+        const times=[t.Fajr,t.Sunrise,t.Dhuhr,t.Asr,t.Maghrib,t.Isha];
+        const cityRes=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+        const cityData=await cityRes.json();
+        const city=cityData.address?.city||cityData.address?.town||cityData.address?.state||'Your Location';
+        document.getElementById('phCity').textContent=`📍 ${city}`;
+        // Qibla
+        const qiblaRes=await fetch(`https://api.aladhan.com/v1/qibla/${lat}/${lng}`);
+        const qiblaData=await qiblaRes.json();
+        if(qiblaData.code===200){
+          const deg=Math.round(qiblaData.data.direction);
+          document.getElementById('qiblaDeg').textContent=`${deg}° from North`;
+        }
+        renderDefaultPrayers(times);
+        showToast('Prayer times updated for your location 📍');
+      }
+    }catch{showToast('Could not fetch prayer times. Showing defaults.');}
+  },()=>{showToast('Location access denied. Showing sample times.');});
+}
+
+// ══════════════════════════════════════════
+// HALAL NEWS
+// ══════════════════════════════════════════
+const newsData = [
+  {
+    id:1, emoji:'🇵🇸', cat:'rights', tag:'Human Rights', tagCls:'nt-rights', time:'2h ago', impact:'high',
+    title:'Gaza Ceasefire Negotiations Resume With New International Pressure',
+    summary:'Diplomatic efforts intensify as multiple Muslim-majority nations push for a permanent ceasefire, with the OIC issuing an emergency resolution calling for immediate humanitarian corridors.',
+    source:'Al Jazeera', featured:true,
+    impactAreas:{ummah:92, political:85, humanitarian:97}
+  },
+  {
+    id:2, emoji:'🕌', cat:'ummah', tag:'Ummah', tagCls:'nt-ummah', time:'4h ago', impact:'med',
+    title:'Saudi Arabia Announces Major Expansion of Masjid al-Nabawi',
+    summary:'A $15 billion project to expand the Prophet\'s Mosque in Madinah will increase capacity to over 1.6 million worshippers simultaneously, set to complete by 2030.',
+    source:'Arab News', featured:false,
+    impactAreas:{ummah:88, spiritual:80, economic:60}
+  },
+  {
+    id:3, emoji:'💰', cat:'economy', tag:'Economy', tagCls:'nt-economy', time:'5h ago', impact:'med',
+    title:'Global Islamic Finance Market Surpasses $3.5 Trillion for First Time',
+    summary:'The Islamic finance sector records historic growth with halal banking, sukuk bonds, and takaful insurance seeing unprecedented demand across Southeast Asia and the Gulf.',
+    source:'Islamic Finance News', featured:false,
+    impactAreas:{ummah:70, economic:95, global:75}
+  },
+  {
+    id:4, emoji:'🇮🇳', cat:'rights', tag:'Human Rights', tagCls:'nt-rights', time:'6h ago', impact:'high',
+    title:'Muslim Minority Rights Under Scrutiny at UN Human Rights Council',
+    summary:'A coalition of 47 countries tables a resolution at the UNHRC calling for greater protections for Muslim minorities facing discrimination and systematic marginalization worldwide.',
+    source:'Middle East Eye', featured:false,
+    impactAreas:{ummah:85, political:90, global:80}
+  },
+  {
+    id:5, emoji:'🔬', cat:'science', tag:'Science', tagCls:'nt-science', time:'8h ago', impact:'low',
+    title:'Muslim Scientists Lead Breakthrough Research in Halal Vaccine Technology',
+    summary:'A team from Malaysia and Turkey develops the world\'s first fully certified halal mRNA vaccine platform, eliminating porcine-derived components from the manufacturing process.',
+    source:'Nature Islam & Science', featured:false,
+    impactAreas:{ummah:75, science:95, health:90}
+  },
+  {
+    id:6, emoji:'🏛️', cat:'politics', tag:'Politics', tagCls:'nt-politics', time:'10h ago', impact:'med',
+    title:'Turkey & Egypt Sign Historic Diplomatic Normalization Agreement',
+    summary:'After years of tension, Turkey and Egypt restore full diplomatic relations, with analysts saying the rapprochement strengthens the Muslim world\'s collective voice on regional issues.',
+    source:'TRT World', featured:false,
+    impactAreas:{ummah:78, political:92, regional:85}
+  },
+  {
+    id:7, emoji:'📚', cat:'ummah', tag:'Ummah', tagCls:'nt-ummah', time:'12h ago', impact:'low',
+    title:'UNESCO Lists Historic Islamic Manuscript Library as World Heritage',
+    summary:'The 12th-century Timbuktu manuscript collection, containing over 400,000 Islamic texts on science, mathematics and theology, receives UNESCO World Heritage protection.',
+    source:'UNESCO', featured:false,
+    impactAreas:{ummah:70, cultural:95, historical:90}
+  },
+  {
+    id:8, emoji:'🌊', cat:'global', tag:'Global', tagCls:'nt-global', time:'14h ago', impact:'high',
+    title:'Muslim-Majority Nations Issue Joint Climate Statement at COP Summit',
+    summary:'56 OIC member states release a unified climate declaration, citing Islamic environmental ethics (Khilafa) as the moral foundation for urgent climate action and green energy transition.',
+    source:'Reuters', featured:false,
+    impactAreas:{global:90, environmental:95, political:70}
+  },
+];
+
+let currentNewsCat = 'all';
+let currentNewsItem = null;
+let newsInited = false;
+
+const NEWS_AI_SYS = `You are NoorBot's Islamic News Analyst. When given a news story, you analyze it from an Islamic perspective and return ONLY valid JSON.
+
+JSON FORMAT:
+{
+  "summary": "3-4 sentence clear plain-English summary of what happened and why it matters",
+  "pros": ["benefit 1", "benefit 2", "benefit 3"],
+  "cons": ["concern 1", "concern 2", "concern 3"],
+  "islamic_perspective": "2-3 sentences on what Islam says about this topic — with reference to relevant Quran verse or Hadith if applicable",
+  "islamic_reference": "Quran X:Y or Hadith source if relevant, else empty string",
+  "what_muslims_can_do": ["action 1", "action 2", "action 3"],
+  "impact_scores": {
+    "muslim_ummah": 0-100,
+    "global_justice": 0-100,
+    "spiritual_reflection": 0-100
+  },
+  "dua_suggestion": "A short relevant dua or dhikr the reader can make regarding this news"
+}
+
+RULES:
+- Be balanced, factual, and fair. Do not be politically partisan.
+- Islamic perspective must cite actual Quran or Hadith when relevant.
+- Pros/cons should be 3 items each, concise and specific.
+- What Muslims can do should be practical and achievable.
+- Return ONLY JSON — no markdown backticks, no preamble.`;
+
+function initNews() {
+  if (newsInited) return;
+  newsInited = true;
+  renderNews();
+}
+
+function filterNews(cat, btn) {
+  currentNewsCat = cat;
+  document.querySelectorAll('.ncat').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNews();
+}
+
+function renderNews() {
+  const filtered = currentNewsCat === 'all' ? newsData : newsData.filter(n => n.cat === currentNewsCat);
+  const featured = filtered.find(n => n.featured) || filtered[0];
+  const rest = filtered.filter(n => n !== featured);
+
+  // Featured
+  const featEl = document.getElementById('newsFeatured');
+  if (featured) {
+    featEl.innerHTML = `
+      <div class="news-featured" onclick="openNews(${featured.id})">
+        <div class="news-feat-img">${featured.emoji}</div>
+        <div class="news-feat-body">
+          <div class="news-feat-meta">
+            <span class="news-feat-tag">${featured.tag}</span>
+            <span class="news-feat-time">🕐 ${featured.time}</span>
+          </div>
+          <div class="news-feat-title">${featured.title}</div>
+          <div class="news-feat-summary">${featured.summary}</div>
+          <div class="news-feat-footer">
+            <button class="news-read-btn">🔍 Islamic Analysis</button>
+            <span class="news-impact">${featured.impact === 'high' ? '🔴 High Impact' : featured.impact === 'med' ? '🟡 Medium Impact' : '🟢 Low Impact'}</span>
+          </div>
+        </div>
+      </div>`;
+  } else { featEl.innerHTML = ''; }
+
+  // List
+  document.getElementById('newsList').innerHTML = rest.map(n => `
+    <div class="news-item" onclick="openNews(${n.id})">
+      <div class="news-item-emoji">${n.emoji}</div>
+      <div class="news-item-body">
+        <div class="news-item-meta">
+          <span class="news-tag ${n.tagCls}">${n.tag}</span>
+          <span class="news-time">${n.time}</span>
+        </div>
+        <div class="news-item-title">${n.title}</div>
+        <div class="news-item-snip">${n.summary}</div>
+        <div class="impact-row">
+          <span class="impact-pill ${n.impact === 'high' ? 'ip-high' : n.impact === 'med' ? 'ip-med' : 'ip-low'}">
+            ${n.impact === 'high' ? '🔴 High Impact' : n.impact === 'med' ? '🟡 Medium' : '🟢 Low Impact'}
+          </span>
+          <span class="impact-pill ip-low">📖 Tap for Analysis</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function openNews(id) {
+  const item = newsData.find(n => n.id === id);
+  if (!item) return;
+  currentNewsItem = item;
+
+  const modal = document.getElementById('newsModal');
+  const inner = document.getElementById('modalInner');
+  document.getElementById('modalTitle').textContent = item.tag + ' · ' + item.time;
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Render static parts immediately
+  inner.innerHTML = `
+    <div class="modal-hero-emoji">${item.emoji}</div>
+    <div class="modal-news-title">${item.title}</div>
+    <div class="modal-meta">
+      <span class="news-tag ${item.tagCls}">${item.tag}</span>
+      <span class="modal-source">📰 ${item.source} · ${item.time}</span>
+    </div>
+    <div class="analysis-loading" id="analysisLoading">
+      <div class="analysis-spin"></div>
+      <p>NoorBot is analyzing from an Islamic perspective...</p>
+    </div>`;
+
+  // Fetch AI analysis
+  try {
+    const data = await callAI(NEWS_AI_SYS, [{
+      role: 'user',
+      content: `Analyze this news story from an Islamic perspective:\n\nTitle: ${item.title}\n\nSummary: ${item.summary}\n\nCategory: ${item.tag}`
+    }]);
+    const raw = data.content?.map(b => b.text || '').join('') || '{}';
+    let result;
+    try { result = JSON.parse(raw.replace(/```json|```/g, '').trim()); } catch { result = null; }
+
+    document.getElementById('analysisLoading').remove();
+
+    if (result) renderNewsAnalysis(result, inner, item);
+    else inner.insertAdjacentHTML('beforeend', '<p style="color:var(--text-muted);text-align:center;padding:20px">Could not load analysis. Please try again.</p>');
+  } catch {
+    document.getElementById('analysisLoading')?.remove();
+    inner.insertAdjacentHTML('beforeend', '<p style="color:var(--text-muted);text-align:center;padding:20px">Connection error. Please try again.</p>');
+  }
+}
+
+function renderNewsAnalysis(r, container, item) {
+  const impactScores = r.impact_scores || {};
+  const relatedItems = newsData.filter(n => n.id !== item.id && (n.cat === item.cat || n.impact === item.impact)).slice(0, 3);
+
+  container.insertAdjacentHTML('beforeend', `
+
+    <!-- SUMMARY -->
+    <div class="analysis-card">
+      <div class="analysis-card-header">📋 What Happened</div>
+      <div class="analysis-card-body">
+        <div class="summary-text">${esc(r.summary || item.summary)}</div>
+      </div>
+    </div>
+
+    <!-- PROS & CONS -->
+    <div class="analysis-card">
+      <div class="analysis-card-header">⚖️ Pros & Concerns</div>
+      <div class="analysis-card-body">
+        <div class="pros-cons-grid">
+          <div class="pros-box">
+            <div class="pc-title">✅ Positives</div>
+            ${(r.pros || []).map(p => `<div class="pc-item"><span class="pc-dot"></span>${esc(p)}</div>`).join('')}
+          </div>
+          <div class="cons-box">
+            <div class="pc-title">⚠️ Concerns</div>
+            ${(r.cons || []).map(c => `<div class="pc-item"><span class="pc-dot"></span>${esc(c)}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISLAMIC PERSPECTIVE -->
+    <div class="analysis-card">
+      <div class="analysis-card-header">☪️ Islamic Perspective</div>
+      <div class="analysis-card-body">
+        <div class="islamic-take">
+          <div class="it-label">🕌 What Islam Says</div>
+          <div class="it-text">${esc(r.islamic_perspective || '')}</div>
+          ${r.islamic_reference ? `<div class="it-ref">📖 ${esc(r.islamic_reference)}</div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPACT METER -->
+    <div class="analysis-card">
+      <div class="analysis-card-header">📊 Impact on the Ummah</div>
+      <div class="analysis-card-body">
+        <div class="impact-meter">
+          <div class="im-row">
+            <span class="im-label">Muslim Ummah</span>
+            <div class="im-bar"><div class="im-fill red" style="width:0%" data-w="${impactScores.muslim_ummah||50}%"></div></div>
+            <span class="im-pct">${impactScores.muslim_ummah||50}%</span>
+          </div>
+          <div class="im-row">
+            <span class="im-label">Global Justice</span>
+            <div class="im-bar"><div class="im-fill gold" style="width:0%" data-w="${impactScores.global_justice||50}%"></div></div>
+            <span class="im-pct">${impactScores.global_justice||50}%</span>
+          </div>
+          <div class="im-row">
+            <span class="im-label">Spiritually</span>
+            <div class="im-bar"><div class="im-fill teal" style="width:0%" data-w="${impactScores.spiritual_reflection||50}%"></div></div>
+            <span class="im-pct">${impactScores.spiritual_reflection||50}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DUA SUGGESTION -->
+    ${r.dua_suggestion ? `
+    <div class="analysis-card">
+      <div class="analysis-card-header">🤲 Dua for This Situation</div>
+      <div class="analysis-card-body">
+        <div class="what-to-do">
+          <div class="wtd-title">Recite this dua</div>
+          <div class="wtd-item">🤲 ${esc(r.dua_suggestion)}</div>
+        </div>
+      </div>
+    </div>` : ''}
+
+    <!-- WHAT MUSLIMS CAN DO -->
+    <div class="analysis-card">
+      <div class="analysis-card-header">✅ What You Can Do as a Muslim</div>
+      <div class="analysis-card-body">
+        <div class="what-to-do">
+          <div class="wtd-title">Practical Actions</div>
+          ${(r.what_muslims_can_do || []).map((a,i) => `<div class="wtd-item">${['1️⃣','2️⃣','3️⃣'][i]||'▶️'} ${esc(a)}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATED NEWS -->
+    ${relatedItems.length ? `
+    <div class="analysis-card">
+      <div class="analysis-card-header">📰 Related Stories</div>
+      <div class="analysis-card-body">
+        <div class="related-row">
+          ${relatedItems.map(n => `
+            <div class="related-chip" onclick="closeAndOpen(${n.id})">
+              <div class="rc-emoji">${n.emoji}</div>
+              <div class="rc-title">${n.title.slice(0,55)}${n.title.length>55?'...':''}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>` : ''}
+  `);
+
+  // Animate impact bars
+  setTimeout(() => {
+    document.querySelectorAll('.im-fill[data-w]').forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+  }, 150);
+}
+
+function closeNewsModal() {
+  document.getElementById('newsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeAndOpen(id) {
+  closeNewsModal();
+  setTimeout(() => openNews(id), 200);
+}
+
+function shareCurrentNews() {
+  if (!currentNewsItem) return;
+  const text = `📰 ${currentNewsItem.title}\n\n${currentNewsItem.summary}\n\n_Analyzed by NoorBot — Islamic AI Companion_`;
+  if (navigator.share) {
+    navigator.share({ title: currentNewsItem.title, text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('News copied to clipboard! 📋'));
+  }
+}
+
+
+(function init(){
+  renderSunnah();
+  renderDuas();
+  const now=new Date();
+  document.getElementById('todayDate').textContent=now.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('phDate').textContent=now.toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('phTime').textContent=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  renderDefaultPrayers();
+})();
+</script>
+</body>
+</html>
