@@ -1015,22 +1015,14 @@ body.urdu .bubble { font-size: 15px; }
 </nav>
 
 <script>
-// ══════════════════════════════════════════
-// KEY CONFIG — loads from localStorage
-// You only set this ONCE via the secret admin screen
-// Visit your site with ?setup at the end to configure
-// e.g. https://yoursite.netlify.app?setup
-// ══════════════════════════════════════════
-const OWNER_KEY = localStorage.getItem('nb_owner_key') || '';
+const OWNER_KEY = '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';  // ← PASTE YOUR sk-ant-api03-... KEY BETWEEN THESE QUOTES
 
 async function callAI(system, messages, maxTokens=1000) {
-  const key = localStorage.getItem('nb_owner_key') || '';
-  if (!key) throw new Error('NO_KEY');
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': key,
+      'x-api-key': OWNER_KEY,
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
@@ -1041,62 +1033,15 @@ async function callAI(system, messages, maxTokens=1000) {
       messages
     })
   });
-  if (!res.ok) {
-    const err = await res.json().catch(()=>({}));
-    throw new Error(err?.error?.message || 'API error ' + res.status);
-  }
+  if (!res.ok) throw new Error('API error ' + res.status);
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
   return data;
 }
-
-function showSetupModal() {}
-function saveApiKey() {}
-function toggleKeyVisibility() {}
-function resetApiKey() {}
-
-// Secret owner setup screen — visit site with ?setup in URL
-// e.g. https://noorbot1407.netlify.app?setup
-(function checkSetup() {
-  if (window.location.search.includes('setup')) {
-    document.body.insertAdjacentHTML('beforeend', `
-    <div id="ownerSetup" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;padding:20px;">
-      <div style="background:#0f1a18;border:2px solid rgba(20,184,166,0.4);border-radius:20px;padding:30px 24px;max-width:420px;width:100%;">
-        <div style="text-align:center;margin-bottom:20px;">
-          <div style="font-size:40px;margin-bottom:8px;">🔐</div>
-          <h2 style="color:#e2ede8;font-size:20px;margin-bottom:6px;">NoorBot Owner Setup</h2>
-          <p style="color:#7a9e94;font-size:13px;line-height:1.6;">This screen is only visible to you.<br>Users will never see this page.</p>
-        </div>
-        <div style="background:#162320;border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#7a9e94;line-height:1.8;">
-          1️⃣ Go to <strong style="color:#fbbf24;">console.anthropic.com</strong><br>
-          2️⃣ Sign up free → API Keys → Create Key<br>
-          3️⃣ Copy key starting with <strong style="color:#fbbf24;">sk-ant-api03-...</strong><br>
-          4️⃣ Paste below and click Activate
-        </div>
-        <a href="https://console.anthropic.com" target="_blank" style="display:block;text-align:center;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:10px;margin-bottom:12px;color:#fbbf24;font-size:13px;font-weight:600;text-decoration:none;">
-          🌐 Open console.anthropic.com →
-        </a>
-        <input id="ownerKeyInput" type="text" placeholder="sk-ant-api03-..."
-          style="width:100%;background:#1d2e2b;border:1.5px solid rgba(20,184,166,.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#e2ede8;outline:none;margin-bottom:10px;font-family:'Tajawal',sans-serif;">
-        <button onclick="
-          const k=document.getElementById('ownerKeyInput').value.trim();
-          if(!k.startsWith('sk-ant')){alert('Key must start with sk-ant-api03-...');return;}
-          localStorage.setItem('nb_owner_key',k);
-          document.getElementById('ownerSetup').remove();
-          alert('✅ NoorBot is now activated for all users! You can close this tab.');
-          window.location.href=window.location.pathname;
-        " style="width:100%;background:linear-gradient(135deg,#0d9488,#14b8a6);border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'Tajawal',sans-serif;">
-          ✅ Activate NoorBot
-        </button>
-        <p style="text-align:center;font-size:11px;color:#4a6b63;margin-top:10px;">
-          🔒 Key saved in your browser only.<br>
-          ⚠️ You must do this setup on the same browser/device that hosts the site,<br>OR just paste the key directly into index.html line 1022.
-        </p>
-      </div>
-    </div>`);
-  }
-})();
-
+function showSetupModal(){}
+function saveApiKey(){}
+function toggleKeyVisibility(){}
+function resetApiKey(){}
 // ══════════════════════════════════════════
 // CORE NAVIGATION
 // ══════════════════════════════════════════
